@@ -24,7 +24,7 @@ module Sidekiq
           return unless !!cronline
 
           ts   = cronline.next_occurrence
-          args = [ts.to_f]
+          args = []
           nj   = next_scheduled_job
 
           if nj
