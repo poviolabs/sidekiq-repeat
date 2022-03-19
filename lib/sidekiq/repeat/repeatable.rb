@@ -9,8 +9,11 @@ module Sidekiq
         def cronline
           return @cronline if @cronline
           return if @block.nil?
-          @cronline = MiniIceCube::MainDsl.new.instance_eval(&@block).to_s
-          @cronline = CronParser.new(@cronline)
+
+          # Support for IceCube
+          @cronline = IceCube::Schedule.new
+          @cronline.add_recurrence_rule(IceCube::Rule.instance_eval(&@block))
+          return @cronline
 
         rescue ArgumentError
           fail "repeat '#{@cronline}' in class #{self.name} is not a valid cron line"
@@ -20,8 +23,8 @@ module Sidekiq
           # Only if repeat is configured.
           return unless !!cronline
 
-          ts   = cronline.next
-          args = [Time.now.to_f, ts.to_f].take(instance_method(:perform).arity)
+          ts   = cronline.next_occurrence
+          args = [ts.to_f]
           nj   = next_scheduled_job
 
           if nj
