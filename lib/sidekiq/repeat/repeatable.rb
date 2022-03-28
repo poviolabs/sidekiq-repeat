@@ -11,7 +11,7 @@ module Sidekiq
           return if @block.nil?
 
           # Support for IceCube
-          @cronline = IceCube::Schedule.new
+          @cronline = IceCube::Schedule.new(Date.today.to_datetime)
           @cronline.add_recurrence_rule(IceCube::Rule.instance_eval(&@block))
           return @cronline
 
